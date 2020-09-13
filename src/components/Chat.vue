@@ -4,14 +4,16 @@
     <h6 class="grey-text text-lighten-1">Welcome {{ name }}</h6>
     <div class="card">
       <div class="card-content">
+        <i class="red-text right material-icons button-pointer" v-on:click="clearChat">delete</i>
         <ul class="messages" v-chat-scroll>
           <li v-for="message in messages" :key="message.id">
-            <span class="teal-text name">{{ message.name + " " }} </span>
+            <span class="teal-text name">{{ message.name + " " }}</span>
             <span class="grey-text text-lighten-3">{{ message.content }}</span>
             <span class="grey-text time">{{ message.timestamp }}</span>
           </li>
         </ul>
       </div>
+
       <div class="card-action">
         <NewMessage :name="name" />
       </div>
@@ -31,6 +33,19 @@ export default {
   components: { NewMessage },
   data() {
     return { messages: [] };
+  },
+  methods: {
+    clearChat() {
+      db.collection("messages")
+        .get()
+        .then((res) => {
+          res.forEach((element) => {
+            element.ref.delete();
+          });
+        });
+      console.log("Chat history deleted successfully");
+      this.messages = [];
+    },
   },
   created() {
     let ref = db.collection("messages").orderBy("timestamp");
@@ -60,6 +75,9 @@ h2 {
 html {
   background-color: #121212;
 }
+.button-pointer {
+  cursor: pointer;
+}
 .chat h2 {
   font-size: 2.6em;
   margin-bottom: 40px;
@@ -77,6 +95,10 @@ html {
 .chat .time {
   display: block;
   font-size: 0.9em;
+}
+
+.enter {
+  font-size: 0.8rem !important;
 }
 
 .messages {
